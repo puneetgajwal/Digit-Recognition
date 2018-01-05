@@ -1,0 +1,21 @@
+{
+    "collab_server" : "",
+    "contents" : "#importing datasets\ntest <- read.csv(file.choose(), header = T)\ntrain <- read.csv(file.choose(), header = T)\n\n# install packages\ninstall.packages(\"readr\")\ninstall.packages(\"ggplot2\")\ninstall.packages(\"caret\")\ninstall.packages(\"Matrix\")\ninstall.packages(\"xgboost\")\n\n# load required packages\nlibrary(readr)\nlibrary(ggplot2)\nlibrary(caret)\nlibrary(Matrix)\nlibrary(xgboost)\n\n#separate label(digit drawn) by the user from train dataset.\nX <- train[,-1]\nY <- train[,1]\ntrainlabel <- train[,1]\n\n\n# xgboost parameters\n\nPARAM <- list(\n  # General Parameters\n  booster            = \"gbtree\",          \n  silent             = 0,                 \n  # Booster Parameters\n  eta                = 0.05,              \n  gamma              = 0,                 \n  max_depth          = 5,                \n  min_child_weight   = 1,                 \n  subsample          = 0.70,             \n  colsample_bytree   = 0.95,             \n  num_parallel_tree  = 1,                 \n  lambda             = 0,                \n  lambda_bias        = 0,                 \n  alpha              = 0,                \n  # Task Parameters\n  objective          = \"multi:softmax\",   \n  num_class          = 10,                \n  base_score         = 0.5,               \n  eval_metric        = \"merror\"           \n)\n\n# convert TRAIN dataframe into a design matrix\nTRAIN_SMM <- sparse.model.matrix(Y ~ ., data = X)\nTRAIN_XGB <- xgb.DMatrix(data = TRAIN_SMM, label = Y)\n\n# set seed\nset.seed(1)\n\n# train xgb model\nMODEL <- xgb.train(params      = PARAM, \n                   data        = TRAIN_XGB, \n                   nrounds     = 400 , \n                   verbose     = 2,\n                   watchlist   = list(TRAIN_SMM = TRAIN_XGB)\n)\n\n# attach a predictions vector to the test dataset\ntest$label <- 0\n\n# use the trained xgb model (\"MODEL\") on the test data (\"TEST\") to predict the response variable (\"LABEL\")\nTEST_SMM <- sparse.model.matrix(LABEL ~ ., data = TEST)\nPRED <- predict(MODEL, TEST_SMM)\n\n# create submission file\nSUBMIT <- data.frame(ImageId = c(1:length(PRED)), Label = PRED)\nwrite_csv(SUBMIT, \"submission.csv\")\n\n######\n testsub = train[35001:42000,]\n trainsub= train[1:35000,]\n \n#Method 2\ninstall.packages(\"drat\", repos = \"https://cran.rstudio.com\")\ndrat::addRepo(\"dmlc\")\ninstall.packages(\"mxnet\")\nlibrary(mxnet)\n \n \n \n \n\n\n\n\n\n",
+    "created" : 1514042947319.000,
+    "dirty" : false,
+    "encoding" : "UTF-8",
+    "folds" : "",
+    "hash" : "2258103964",
+    "id" : "829B21D8",
+    "lastKnownWriteTime" : 1514552874,
+    "last_content_update" : 1514552874239,
+    "path" : "F://Digit Recognition/code.R",
+    "project_path" : "code.R",
+    "properties" : {
+        "tempName" : "Untitled1"
+    },
+    "relative_order" : 1,
+    "source_on_save" : false,
+    "source_window" : "",
+    "type" : "r_source"
+}
